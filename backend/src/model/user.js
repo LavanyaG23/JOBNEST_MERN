@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
 
    type: String,
 
-   enum: ['jobSeeker', 'recruiter'],  // Define roles for user
+   enum: ['jobseeker', 'recruiter'],  // Define roles for user
 
    required: true,
 

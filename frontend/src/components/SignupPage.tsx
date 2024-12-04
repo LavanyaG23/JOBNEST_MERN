@@ -1,150 +1,225 @@
 import React, { useState } from "react";
 
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 
 import axios from "axios";
 
 import { useNavigate } from "react-router-dom";
 
+
+ 
+
 interface SignupPageProps {
-  onSwitchToLogin: () => void;
+
+ onSwitchToLogin: () => void;
+
 }
 
+
+ 
+
 const SignupPage: React.FC<SignupPageProps> = ({ onSwitchToLogin }) => {
-  const [role, setRole] = useState<string>("jobseeker");
 
-  const navigate = useNavigate();
+ const [email, setEmail] = useState<string>("");
 
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ const [password, setPassword] = useState<string>("");
 
-  //  e.preventDefault();
+ const [role, setRole] = useState<string>("jobseeker");
 
-  //  const formData = new FormData(e.currentTarget);
+ const [error, setError] = useState<string | null>(null);
 
-  //  const email = formData.get("email") as string;
+ const [success, setSuccess] = useState<boolean>(false);
 
-  //  const password = formData.get("password") as string;
 
-  //  if (!role) {
+ 
 
-  //    alert("Please select a role (Jobseeker or Recruiter).");
+ const navigate = useNavigate();
 
-  //    return;
 
-  //  }
+ 
 
-  //  try {
+ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
-  //    const response = await axios.post("http://localhost:5000/api/v1/auth/signup", {
+   e.preventDefault();
 
-  //      email,
+   try {
 
-  //      password,
+     const response = await axios.post("http://localhost:5000/api/v1/auth/signup", {
 
-  //      role,
+       email,
 
-  //    });
+       password,
 
-  //    if(response.data.success){
+       role,
 
-  //     navigate("/jobpost", {state: {role}});
+     });
 
-  //    }
 
-  //    else{
+ 
 
-  //     alert("Signup failed! Please try again")
+     if (response.status === 201) {
 
-  //    }
+       setSuccess(true);
 
-  //    console.log("Signup response:", response.data);
+       setError(null);
 
-  //  } catch (error) {
+       localStorage.setItem("userRole", role);
 
-  //    console.error("Error signing up:", error);
+       navigate("/dashboard", { state: { role } });
 
-  //  }
+     }
 
-  // };
+   } catch (err: any) {
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+     setError(err.response?.data?.error || "Something went wrong");
 
-    localStorage.setItem("userRole", role);
+     setSuccess(false);
 
-    navigate("/dashboard", { state: { role } });
-  };
+   }
 
-  return (
-    <Container className="d-flex justify-content-center align-items-center vh-100">
-      <Row className="w-100">
-        <Col xs={12} md={8} lg={12} className="mx-auto">
-          <h2 className="text-center mb-4">Let's get started!</h2>
+ };
 
-          <Form onSubmit={handleSubmit} className="border p-4 rounded shadow">
-            <Form.Group className="mb-3" controlId="email">
-              <Form.Label>Email</Form.Label>
 
-              <Form.Control
-                type="email"
-                name="email"
-                placeholder="Enter email"
-                required
-              />
-            </Form.Group>
+ 
 
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Label>Password</Form.Label>
+ return (
 
-              <Form.Control
-                type="password"
-                name="password"
-                placeholder="Enter password"
-                required
-              />
-            </Form.Group>
+   <Container className="d-flex justify-content-center align-items-center vh-100">
 
-            <Form.Group className="mb-3">
-              <Form.Label>Role</Form.Label>
+     <Row className="w-100">
 
-              <div>
-                <Form.Check
-                  type="radio"
-                  id="jobseeker"
-                  name="role"
-                  label="Jobseeker"
-                  value="jobseeker"
-                  onChange={(e) => setRole(e.target.value)}
-                  inline
-                />
+       <Col xs={12} md={8} lg={12} className="mx-auto">
 
-                <Form.Check
-                  type="radio"
-                  id="recruiter"
-                  name="role"
-                  label="Recruiter"
-                  value="recruiter"
-                  onChange={(e) => setRole(e.target.value)}
-                  inline
-                />
-              </div>
-            </Form.Group>
+         <h2 className="text-center mb-4">Let's get started!</h2>
 
-            <Button type="submit" variant="primary" className="w-100">
-              Signup
-            </Button>
-          </Form>
+         <Form onSubmit={handleSubmit} className="border p-4 rounded shadow">
 
-          <p className="text-center mt-3">
-            Already have an account?{" "}
-            <Button variant="link" onClick={onSwitchToLogin} className="p-0">
-              Login here
-            </Button>
-          </p>
-        </Col>
-      </Row>
-    </Container>
-  );
+           {error && <Alert variant="danger">{error}</Alert>}
+
+           {success && <Alert variant="success">Signup successful!</Alert>}
+
+           <Form.Group className="mb-3" controlId="email">
+
+             <Form.Label>Email</Form.Label>
+
+             <Form.Control
+
+               type="email"
+
+               value={email}
+
+               onChange={(e) => setEmail(e.target.value)}
+
+               placeholder="Enter email"
+
+               required
+
+             />
+
+           </Form.Group>
+
+           <Form.Group className="mb-3" controlId="password">
+
+             <Form.Label>Password</Form.Label>
+
+             <Form.Control
+
+               type="password"
+
+               value={password}
+
+               onChange={(e) => setPassword(e.target.value)}
+
+               placeholder="Enter password"
+
+               required
+
+             />
+
+           </Form.Group>
+
+           <Form.Group className="mb-3">
+
+             <Form.Label>Role</Form.Label>
+
+             <div>
+
+               <Form.Check
+
+                 type="radio"
+
+                 id="jobseeker"
+
+                 name="role"
+
+                 label="Jobseeker"
+
+                 value="jobseeker"
+
+                 checked={role === "jobseeker"}
+
+                 onChange={(e) => setRole(e.target.value)}
+
+                 inline
+
+               />
+
+               <Form.Check
+
+                 type="radio"
+
+                 id="recruiter"
+
+                 name="role"
+
+                 label="Recruiter"
+
+                 value="recruiter"
+
+                 checked={role === "recruiter"}
+
+                 onChange={(e) => setRole(e.target.value)}
+
+                 inline
+
+               />
+
+             </div>
+
+           </Form.Group>
+
+           <Button type="submit" variant="primary" className="w-100">
+
+             Signup
+
+           </Button>
+
+         </Form>
+
+         <p className="text-center mt-3">
+
+           Already have an account?{" "}
+
+           <Button variant="link" onClick={onSwitchToLogin} className="p-0">
+
+             Login here
+
+           </Button>
+
+         </p>
+
+       </Col>
+
+     </Row>
+
+   </Container>
+
+ );
+
 };
 
+
+ 
+
 export default SignupPage;
+
