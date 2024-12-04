@@ -27,6 +27,11 @@ routing.post("/signup", authController.signup);
 
 routing.post("/login", authController.login);
 
+routing.post("/logout", (req, res) => {
+    res.clearCookie('token');
+    res.status(200).json({ message: "Logged out successfully" });
+});
+
 
 
  

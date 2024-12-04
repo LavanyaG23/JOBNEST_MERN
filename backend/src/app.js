@@ -12,6 +12,8 @@ const cors = require('cors');
 
 const router = require('./routes/routing');
 
+const authRoutes = require('./routes/authRoutes');
+
 const myErrorLogger = require('./utilities/errorlogger');
 
 const myRequestLogger = require('./utilities/requestlogger');
@@ -22,7 +24,10 @@ const myRequestLogger = require('./utilities/requestlogger');
 
 //Middleware
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Allow only your frontend
+    credentials: true, // Enable credentials
+}));
 
 app.use(express.json());
 
@@ -56,6 +61,7 @@ app.get('/setupDb', async(req, res, next) => {
 //use routes
 
 app.use('/api/v1', router);
+app.use('/api/auth', authRoutes);
 
 
  

@@ -39,6 +39,24 @@ const Dashboard: React.FC = () => {
     setSelectedChatIndex(null);
   };
 
+  const handleLogout = async () => {
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/logout', {
+            method: 'POST',
+            credentials: 'include',
+        });
+
+        if (response.ok) {
+            localStorage.removeItem('token'); // Clear stored token
+            navigate('/'); // Redirect to homepage/login
+        } else {
+            console.error('Logout failed');
+        }
+    } catch (error) {
+        console.error('Error during logout', error);
+    }
+};
+
   const handleCultureFitUpdate = (cultureFit: string[]) => {
     setCultureFit(cultureFit);
   };
@@ -252,6 +270,9 @@ const Dashboard: React.FC = () => {
                     <Card.Title>Logout</Card.Title>
 
                     <Card.Text>You can logout from here.</Card.Text>
+                    <button onClick={handleLogout} className="btn btn-danger">
+                        Logout
+                    </button>
                   </Card.Body>
                 </Card>
               </Tab.Pane>
